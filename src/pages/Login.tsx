@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import {Link, useNavigate} from "react-router-dom";
 import { api, setAuth } from '../../api';
@@ -53,7 +52,7 @@ export default function Login(){
                      <label htmlFor="">Contrasena</label>
                      <div className="pass">
                         <input 
-                        type="text"
+                        type={show ? "text" : "password"}
                         placeholder="Ingresa tu contrasena"
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}

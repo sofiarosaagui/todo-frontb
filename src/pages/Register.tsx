@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import {Link, useNavigate} from "react-router-dom";
 import { api, setAuth } from '../../api';
@@ -23,8 +22,8 @@ export default function Register(){
             localStorage.setItem("token",data.token);
             setAuth(data.token);
             nav("/dashboard");
-        } catch (error : any) {
-            setError(error.response?.data.message || "Error al registrar");
+        } catch (err) {
+            setError((err as any).response?.data.message || "Error al registrar");
         }finally{
             setLoading(false);
         }
@@ -63,7 +62,7 @@ export default function Register(){
                      <label htmlFor="">Contrasena</label>
                      <div className="pass">
                         <input 
-                        type="text"
+                        type={show ? "text" : "password"}
                         placeholder="Ingresa tu contrasena"
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
