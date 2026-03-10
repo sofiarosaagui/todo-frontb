@@ -316,7 +316,7 @@ export default function Dashboard() {
       <Notifications />
 
       <header className="topbar">
-        <h1>To-Do PWA</h1>
+        <h1>To-Do Sofia</h1>
         <div className="spacer" />
         <div className="stats">
           <span>Total: {stats.total}</span>

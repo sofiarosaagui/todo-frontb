@@ -1,7 +1,7 @@
 import { useState } from "react";
 import {Link, useNavigate} from "react-router-dom";
 import { api, setAuth } from '../../api';
-import Logo from "../assets/react.svg";
+import Logo from "../../public/Logo.png";
 
 export default function Login(){
     const nav = useNavigate();
@@ -34,7 +34,7 @@ export default function Login(){
             <div className="card">
                 <div className="brand">
                     <img src={Logo} alt="logo-img" />
-                    <h2>TO-DO PWA</h2>
+                    <h2>TO-DO SOFIA</h2>
                     <p className="muted">
                         Bienvenido, Inicia sesion para continuar
                     </p>
