@@ -1,15 +1,9 @@
-// src/components/Notifications.tsx
 
-// Importa hooks de React:
-// - useEffect: para ejecutar código cuando el componente se monta/desmonta
-// - useState: para guardar y actualizar la lista de notificaciones
-// - useRef: para guardar los timers sin causar re-renders
 import { useEffect, useState, useRef } from "react";
 
-// Importa la función para escuchar notificaciones y el tipo de dato Notification
+
 import { onNotification, type Notification } from "./offline/notificacion-bus";
 
-// Tiempo en milisegundos que una notificación permanece visible antes de desaparecer sola (4.5 segundos)
 const AUTO_DISMISS_MS = 4500;
 
 // Objeto que define los colores y el ícono para cada tipo de notificación

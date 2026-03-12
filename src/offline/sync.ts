@@ -1,35 +1,27 @@
+
 import { api } from "../../api";
 
-// Importa funciones para manejar la base de datos local y la cola de operaciones pendientes:
-// - getOutbox: obtiene todas las operaciones pendientes de sincronizar
-// - clearOutbox: limpia toda la cola de operaciones pendientes
-// - queue: agrega una operación a la cola offline
-// - setMapping: guarda la relación entre un ID local (clienteId) y el ID real del servidor (serverId)
-// - getMapping: obtiene el ID del servidor a partir de un ID local
-// - removeTaskLocal: elimina una tarea del almacenamiento local
-// - promoteLocalToServer: reemplaza el ID local de una tarea por el ID real del servidor
 import {
   getOutbox, clearOutbox, queue, setMapping, getMapping,
   removeTaskLocal, promoteLocalToServer
 } from "./db";
 
-// Importa la función para mostrar notificaciones visuales al usuario
+
 import { notify } from "./notificacion-bus";
 
-// Flag global del módulo que indica si ya hay una sincronización en curso
-// Al ser una variable del módulo (fuera del componente), sobrevive re-renders y al doble montaje de React StrictMode
+
 let isSyncing = false;
 
-// Función principal que sincroniza todas las operaciones pendientes con el servidor
+
 export async function syncNow() {
-  if (!navigator.onLine) return;  // Si no hay internet, no hace nada
-  if (isSyncing) return;          // Si ya hay un sync en curso, ignora esta llamada para evitar duplicados
-  isSyncing = true;               // Marca que ya hay una sincronización activa
+  if (!navigator.onLine) return;  
+  if (isSyncing) return;         
+  isSyncing = true;               
 
   try {
-    // Obtiene la lista de operaciones pendientes y las ordena por timestamp (las más antiguas primero)
+    
     const ops = (await getOutbox() as any[]).sort((a,b)=>a.ts-b.ts);
-    if (!ops.length) return; // Si no hay nada pendiente, termina sin hacer nada
+    if (!ops.length) return; 
 
     const failedOps: any[] = []; // Acumulador de operaciones que fallaron para re-encolarlas después
 
@@ -125,39 +117,38 @@ export async function syncNow() {
       }
     }
 
-    // Limpia toda la cola de operaciones pendientes
     await clearOutbox();
 
-    // Vuelve a encolar solo las operaciones que fallaron para reintentarlas en el próximo sync
+    
     for (const op of failedOps) await queue(op);
 
   } finally {
-    isSyncing = false; // Libera el flag siempre, incluso si hubo un return anticipado dentro del try
+    isSyncing = false; 
   }
 }
 
-// Configura la sincronización automática al recuperar conexión y cada 30 segundos si hay pendientes
+
 export function setupOnlineSync(onSyncDone?: () => void) {
 
-  // Función que ejecuta el sync y avisa al Dashboard cuando termina
+  
   const handler = async () => {
-    await syncNow();    // Espera a que termine toda la sincronización
-    onSyncDone?.();     // Solo entonces notifica al componente que llamó a esta función
+    await syncNow();    
+    onSyncDone?.();     
   };
 
-  // Intervalo que revisa cada 30 segundos si hay operaciones pendientes y hay internet
-  const interval = setInterval(async () => {
-    if (!navigator.onLine) return; // Si no hay internet, no hace nada
-    const ops = await import("./db").then((m) => m.getOutbox()); // Obtiene la cola de pendientes
-    if (ops.length) await handler(); // Si hay pendientes y hay conexión, intenta sincronizar
-  }, 30_000); // Se ejecuta cada 30 segundos
 
-  // Escucha el evento del navegador cuando se recupera la conexión a internet
+  const interval = setInterval(async () => {
+    if (!navigator.onLine) return; 
+    const ops = await import("./db").then((m) => m.getOutbox()); 
+    if (ops.length) await handler(); 
+  }, 30_000); 
+
+  
   window.addEventListener("online", handler);
 
-  // Retorna una función de limpieza que cancela el listener y el intervalo al desmontar
+  
   return () => {
-    window.removeEventListener("online", handler); // Deja de escuchar reconexiones
-    clearInterval(interval);                       // Cancela el intervalo de 30 segundos
+    window.removeEventListener("online", handler); 
+    clearInterval(interval);                       
   };
 }
